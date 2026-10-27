@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.89" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.33" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\*.sql" CopyToOutputDirectory="PreserveNewest" />
+    <!-- El SDK web ya incluye **\*.json como Content: se reemplaza para que Data/paises-es.json
+         se copie al directorio de salida y MapeadorPbdb pueda leerlo desde AppContext.BaseDirectory. -->
+    <Content Remove="Data\*.json" />
+    <Content Include="Data\*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
