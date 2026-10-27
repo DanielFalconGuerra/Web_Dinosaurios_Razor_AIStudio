@@ -1,0 +1,246 @@
+@*
+    =============================================================================
+    Web_Dinosaurios — Views/Dinosaurios/Detalle.cshtml
+    Ficha Paleobiológica y Estratigráfica de Detalle
+    Modelo: Web_Dinosaurios.Models.Dinosaurio
+    =============================================================================
+*@
+@model Web_Dinosaurios.Models.Dinosaurio
+@{
+    ViewData["Title"] = Model.Nombre;
+
+    var esIcono = Presentacion.EsIcono(Model.ImagenUrl);
+    var clasesPeriodo = Presentacion.ClasesPeriodo(Model.Periodo);
+    var limitesEpoca = Presentacion.LimitesEpoca(Model.Periodo);
+    var textoFuente = Presentacion.TextoFuente(Model.FuenteUrl);
+}
+
+<article class="dino-detail-page py-4 py-lg-5" aria-labelledby="dino-taxon-heading">
+    <div class="container-xxl">
+
+        <!-- Barra de Navegación Retrospectiva (Volver al Catálogo) -->
+        <nav class="dino-breadcrumbs mb-4" aria-label="Migas de pan">
+            <div class="d-flex align-items-center justify-content-between">
+                <a asp-controller="Dinosaurios"
+                   asp-action="Index"
+                   class="dino-back-link text-decoration-none d-inline-flex align-items-center gap-2 small fw-semibold">
+                    <span aria-hidden="true">&larr;</span> Volver al catálogo cronoestratigráfico
+                </a>
+                <span class="dino-mono-num text-muted small">
+                    Ficha ID: #@Model.Id.ToString("D4")
+                </span>
+            </div>
+        </nav>
+
+        <!-- Cabecera Taxonómica Principal -->
+        <header class="dino-detail-header pb-4 mb-4 border-bottom @clasesPeriodo">
+            <div class="row align-items-start g-3">
+                <div class="col-12 col-lg-8">
+                    <!-- Época y Rango Cronológico -->
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        <span class="dino-badge-epoch fw-semibold">
+                            @Model.Periodo
+                        </span>
+                        @if (!string.IsNullOrWhiteSpace(limitesEpoca))
+                        {
+                            <span class="dino-mono-num text-muted small">
+                                (@limitesEpoca)
+                            </span>
+                        }
+                        <span class="text-muted" aria-hidden="true">·</span>
+                        <span class="dino-mono-num text-muted small">
+                            @Model.Antiguedad
+                        </span>
+                    </div>
+
+                    <!-- Nombre del Género / Especie (Siempre en cursiva) -->
+                    <h1 id="dino-taxon-heading" class="dino-detail-title display-4 fw-bold text-dark mb-2">
+                        <em>@Model.Nombre</em>
+                    </h1>
+
+                    <p class="dino-detail-subtitle text-muted mb-0">
+                        Clasificación de dinosaurio no aviano registrado en los estratos del período @Model.Periodo.
+                    </p>
+                </div>
+
+                <!-- Placa de Contexto Geocronológico -->
+                <div class="col-12 col-lg-4 text-lg-end">
+                    <div class="dino-age-card p-3 rounded-3 border d-inline-block text-start text-lg-end">
+                        <span class="d-block small text-muted text-uppercase tracking-wider">Antigüedad Estratigráfica</span>
+                        <span class="dino-age-value dino-mono-num fw-bold d-block">
+                            @(Model.EdadMaxMa.HasValue ? $"~{Model.EdadMaxMa.Value:F1} Ma" : Model.Antiguedad)
+                        </span>
+                        <span class="d-block small text-muted">
+                            Límite geológico máximo
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Bloque Central: Ficha Visual + Prosa Curatorial -->
+        <div class="row g-4 g-xl-5">
+
+            <!-- Columna Izquierda: Imagen de Reconstrucción o Placa Fósil de Campo -->
+            <div class="col-12 col-lg-6">
+                <div class="dino-specimen-display border rounded-3 overflow-hidden">
+                    @if (!esIcono)
+                    {
+                        <!-- Especie con Fotografía Histórica / Paleoarte (Wikimedia Commons) -->
+                        <figure class="m-0 position-relative">
+                            <div class="dino-media-frame bg-light text-center p-2">
+                                <img src="@Model.ImagenUrl"
+                                     alt="Reconstrucción fósil o paleoartística de @Model.Nombre"
+                                     class="dino-detail-img img-fluid rounded"
+                                     loading="eager"
+                                     referrerpolicy="no-referrer" />
+                            </div>
+                            <!-- Crédito obligatorio de la imagen para Wikimedia Commons -->
+                            @if (!string.IsNullOrWhiteSpace(Model.CreditoImagen))
+                            {
+                                <figcaption class="dino-media-caption p-3 border-top small text-muted">
+                                    <strong class="d-block text-dark fw-semibold mb-1">Crédito de la ilustración / fotografía:</strong>
+                                    <span>@Model.CreditoImagen</span>
+                                </figcaption>
+                            }
+                        </figure>
+                    }
+                    else
+                    {
+                        <!-- Especie Fósil sin Imagen Individual (PBDB / Wikipedia) -->
+                        <div class="dino-plate-specimen p-4 p-md-5 text-center">
+                            <div class="dino-fossil-stamp mx-auto mb-4" aria-hidden="true">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C10.5 4 8.5 7.5 7 10c-1 1.6-1.5 3-1.5 4.5 0 3.6 2.9 6.5 6.5 6.5s6.5-2.9 6.5-6.5c0-1.5-.5-2.9-1.5-4.5-1.5-2.5-3.5-6-5-8zm-5 7c-.6 0-1.1-.4-1.3-.9L5 6.5C4.7 5.7 5.2 4.9 6 4.6c.8-.3 1.7.2 2 1l.7 1.6c.3.8-.1 1.8-.7 1.8zm10 0c-.6 0-1-.8-.7-1.8l.7-1.6c.3-.8 1.2-1.3 2-1 .8.3 1.3 1.1 1 1.9l-.7 1.6c-.2.5-.7.9-1.3.9z"/>
+                                </svg>
+                            </div>
+                            <h2 class="h5 fw-bold text-dark mb-2">Ficha Taxonómica de Registro Paleobiológico</h2>
+                            <p class="text-muted small mb-3 max-w-prose mx-auto">
+                                Este taxón cuenta con registro catalogado en la <em>Paleobiology Database</em> (PBDB) y en la enciclopedia libre, pero no dispone aún de una fotografía con licencia libre en el archivo de Wikimedia Commons.
+                            </p>
+                            <div class="dino-specimen-id-box d-inline-block py-2 px-3 rounded border text-muted small dino-mono-num">
+                                Colección PBDB: @(Model.PbdbId?.ToString() ?? "Sin identificador numérico")
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Placa de Atributos Paleobiológicos -->
+                <div class="dino-attributes-card mt-4 p-3 p-md-4 rounded-3 border">
+                    <h2 class="h6 text-uppercase tracking-wider fw-bold text-dark mb-3">
+                        Ficha Biológica y Geográfica
+                    </h2>
+                    <dl class="dino-meta-list mb-0">
+                        <!-- Régimen Trófico -->
+                        <div class="dino-meta-row py-2 border-bottom d-flex justify-content-between align-items-center">
+                            <dt class="text-muted small fw-medium mb-0">Régimen Trófico (Dieta)</dt>
+                            <dd class="text-dark fw-semibold small mb-0">@Model.Dieta</dd>
+                        </div>
+
+                        <!-- Distribución Paleogeográfica -->
+                        <div class="dino-meta-row py-2 border-bottom d-flex justify-content-between align-items-center">
+                            <dt class="text-muted small fw-medium mb-0">Región de Hallazgo</dt>
+                            <dd class="text-dark fw-semibold small mb-0">@Model.Region</dd>
+                        </div>
+
+                        <!-- Época ICS -->
+                        <div class="dino-meta-row py-2 border-bottom d-flex justify-content-between align-items-center">
+                            <dt class="text-muted small fw-medium mb-0">Época Estratigráfica</dt>
+                            <dd class="text-dark fw-semibold small mb-0">@Model.Periodo</dd>
+                        </div>
+
+                        <!-- Antigüedad estimada -->
+                        <div class="dino-meta-row py-2 border-bottom d-flex justify-content-between align-items-center">
+                            <dt class="text-muted small fw-medium mb-0">Antigüedad Aproximada</dt>
+                            <dd class="text-dark dino-mono-num small mb-0">@Model.Antiguedad</dd>
+                        </div>
+
+                        <!-- Identificador PBDB -->
+                        @if (Model.PbdbId.HasValue)
+                        {
+                            <div class="dino-meta-row py-2 border-bottom d-flex justify-content-between align-items-center">
+                                <dt class="text-muted small fw-medium mb-0">Referencia Paleobiology Database</dt>
+                                <dd class="text-dark dino-mono-num small mb-0">#@Model.PbdbId.Value</dd>
+                            </div>
+                        }
+
+                        <!-- Edad Máxima Ma -->
+                        @if (Model.EdadMaxMa.HasValue)
+                        {
+                            <div class="dino-meta-row py-2 d-flex justify-content-between align-items-center">
+                                <dt class="text-muted small fw-medium mb-0">Límite Superior (EdadMaxMa)</dt>
+                                <dd class="text-dark dino-mono-num small mb-0">@Model.EdadMaxMa.Value.ToString("F2") Ma</dd>
+                            </div>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Sinopsis Monográfica y Fuente de Consulta -->
+            <div class="col-12 col-lg-6">
+                <section class="dino-essay-section" aria-labelledby="heading-sinopsis">
+                    <span class="dino-kicker text-uppercase tracking-widest text-muted small fw-semibold">
+                        Registro Monográfico
+                    </span>
+                    <h2 id="heading-sinopsis" class="h3 fw-bold text-dark mt-1 mb-3">
+                        Descripción Paleontológica
+                    </h2>
+
+                    <!-- Texto con Medida de Lectura Editorial (65–75ch) -->
+                    <div class="dino-prose mb-4">
+                        <p class="dino-lead-paragraph">
+                            @Model.Descripcion
+                        </p>
+                    </div>
+
+                    <!-- Caja de Fuente Científica y Lectura Externa -->
+                    <div class="dino-source-card p-4 rounded-3 border bg-white mb-4">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="dino-source-icon mt-1" aria-hidden="true">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="h6 fw-bold text-dark mb-1">Fuente y documentación primaria</h3>
+                                <p class="small text-muted mb-3">
+                                    Para acceder a la bibliografía completa, sinapomorfias morfológicas y coordenadas estratigráficas de los yacimientos:
+                                </p>
+                                @if (!string.IsNullOrWhiteSpace(Model.FuenteUrl))
+                                {
+                                    <a href="@Model.FuenteUrl"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn dino-btn-primary btn-sm d-inline-flex align-items-center gap-2">
+                                        <span>@textoFuente</span>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                            <polyline points="15 3 21 3 21 9"/>
+                                            <line x1="10" y1="14" x2="21" y2="3"/>
+                                        </svg>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Fuente primaria no enlazada en la base de datos.</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enlace Rápido de Regreso -->
+                    <div class="pt-3 border-top">
+                        <a asp-controller="Dinosaurios"
+                           asp-action="Index"
+                           class="btn dino-btn-secondary">
+                            &larr; Explorar más dinosaurios del catálogo
+                        </a>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+
+    </div>
+</article>

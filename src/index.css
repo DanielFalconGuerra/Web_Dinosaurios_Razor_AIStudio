@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/* -------------------------------------------------------------------------
+   VARIABLES DE DISEÑO & TOKENS PALEONTOLÓGICOS (Web_Dinosaurios)
+   ------------------------------------------------------------------------- */
+:root {
+    --dino-font-display: 'Fraunces', Georgia, serif;
+    --dino-font-strata: 'Cinzel', Georgia, serif;
+    --dino-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --dino-font-mono: 'JetBrains Mono', SFMono-Regular, Consolas, monospace;
+
+    --dino-bg: #F8F6F0;
+    --dino-surface: #FFFFFF;
+    --dino-surface-subtle: #F2EFE7;
+    --dino-border: #E5DFC9;
+    --dino-border-subtle: #ECE8DC;
+
+    --dino-ink: #1F1B18;
+    --dino-ink-muted: #645C52;
+    --dino-ink-faint: #8E8476;
+
+    --dino-amber: #B45309;
+    --dino-amber-dark: #92400E;
+    --dino-amber-light: #FEF3C7;
+    --dino-terracotta: #9A3412;
+
+    /* Códigos Cronoestratigráficos Internacionales (ICS) */
+    --dino-cretacico-base: #166534;
+    --dino-cretacico-bg: #F0FDF4;
+    --dino-cretacico-border: #BBF7D0;
+    --dino-cretacico-text: #14532D;
+
+    --dino-jurasico-base: #1E3A8A;
+    --dino-jurasico-bg: #EFF6FF;
+    --dino-jurasico-border: #BFDBFE;
+    --dino-jurasico-text: #1E40AF;
+
+    --dino-triasico-base: #991B1B;
+    --dino-triasico-bg: #FEF2F2;
+    --dino-triasico-border: #FECACA;
+    --dino-triasico-text: #991B1B;
+
+    --dino-shadow-sm: 0 1px 3px rgba(31, 27, 24, 0.05);
+    --dino-shadow-md: 0 4px 12px rgba(31, 27, 24, 0.07);
+    --dino-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+    background-color: var(--dino-bg);
+    color: var(--dino-ink);
+    font-family: var(--dino-font-sans);
+}
+
+.dino-mono-num {
+    font-family: var(--dino-font-mono);
+    font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+.dino-title,
+.dino-detail-title,
+.dino-taxon-link {
+    font-family: var(--dino-font-display);
+}
+
+.dino-brand-title,
+.dino-scale-name,
+.dino-stratum-title {
+    font-family: var(--dino-font-strata);
+}
+
+.dino-lead-paragraph::first-letter {
+    font-family: var(--dino-font-display);
+    font-size: 3.5rem;
+    line-height: 0.85;
+    float: left;
+    margin-right: 0.5rem;
+    color: var(--dino-amber-dark);
+    font-weight: 700;
+}
+
+:focus-visible {
+    outline: 2px solid var(--dino-amber) !important;
+    outline-offset: 2px !important;
+}

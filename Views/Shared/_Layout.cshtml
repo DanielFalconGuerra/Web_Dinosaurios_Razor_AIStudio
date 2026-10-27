@@ -1,0 +1,157 @@
+@*
+    =============================================================================
+    Web_Dinosaurios — Views/Shared/_Layout.cshtml
+    Catálogo Estratigráfico de Dinosaurios del Mesozoico
+    Compatibilidad: ASP.NET Core 8 MVC · Bootstrap 5 · HTML5 Semántico
+    =============================================================================
+*@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] != null ? $"{ViewData["Title"]} — " : "")Dinosaurios del Mesozoico</title>
+    <meta name="description" content="Registro estratigráfico y taxonómico de 1.617 dinosaurios del Mesozoico. Datos de la Paleobiology Database y Wikipedia en español." />
+
+    <!-- Google Fonts: Fraunces (titular orgánico/editorial), Cinzel (monumental/estratigráfico), Plus Jakarta Sans (prosa), JetBrains Mono (cifras tabulares) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!-- Estilos específicos de Web_Dinosaurios -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="dino-body d-flex flex-column min-vh-100">
+    <!-- Barra superior institucional (Top Bar Contract: 3 zonas delimitadas) -->
+    <header class="dino-header border-bottom sticky-top">
+        <div class="container-xxl">
+            <div class="d-flex align-items-center justify-content-between py-3 gap-3">
+                <!-- Zona 1: Identificador institucional de una sola línea -->
+                <a asp-controller="Dinosaurios" asp-action="Index" class="dino-brand text-decoration-none">
+                    <span class="dino-brand-sub">Archivo Paleobiológico</span>
+                    <span class="dino-brand-title">Dinosaurios del Mesozoico</span>
+                </a>
+
+                <!-- Zona 2: Enlaces canónicos concisos -->
+                <nav class="dino-nav d-none d-md-flex align-items-center gap-4" aria-label="Navegación principal">
+                    <a asp-controller="Dinosaurios" asp-action="Index" class="dino-nav-link text-decoration-none">
+                        Catálogo de Especies
+                    </a>
+                    <a href="#escala-mesozoica" class="dino-nav-link text-decoration-none">
+                        Escala Estratigráfica
+                    </a>
+                    <a href="#acerca-fuentes" class="dino-nav-link text-decoration-none">
+                        Fuentes &amp; Metodología
+                    </a>
+                </nav>
+
+                <!-- Zona 3: Acción primaria contextual -->
+                <div class="d-flex align-items-center gap-2">
+                    <a asp-controller="Dinosaurios" asp-action="Index" class="btn dino-btn-primary btn-sm">
+                        Explorar Catálogo
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cinta de Referencia Cronoestratigráfica Rápida -->
+        <aside class="dino-strata-strip" aria-label="Cronoestratigrafía del Mesozoico">
+            <div class="container-xxl">
+                <div class="d-flex align-items-center justify-content-between py-1 small">
+                    <div class="dino-strip-item dino-strip-cretacico">
+                        <span class="dino-strip-dot"></span>
+                        <strong class="fw-semibold">Cretácico</strong>
+                        <span class="text-muted d-none d-sm-inline">145–66 Ma</span>
+                    </div>
+                    <div class="dino-strip-divider" aria-hidden="true">/</div>
+                    <div class="dino-strip-item dino-strip-jurasico">
+                        <span class="dino-strip-dot"></span>
+                        <strong class="fw-semibold">Jurásico</strong>
+                        <span class="text-muted d-none d-sm-inline">201,4–145 Ma</span>
+                    </div>
+                    <div class="dino-strip-divider" aria-hidden="true">/</div>
+                    <div class="dino-strip-item dino-strip-triasico">
+                        <span class="dino-strip-dot"></span>
+                        <strong class="fw-semibold">Triásico</strong>
+                        <span class="text-muted d-none d-sm-inline">251,9–201,4 Ma</span>
+                    </div>
+                    <div class="d-none d-lg-block text-muted text-uppercase tracking-wider dino-mono-num small">
+                        1.617 Taxones Registrados
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main id="main-content" class="flex-grow-1" role="main">
+        @RenderBody()
+    </main>
+
+    <!-- Pie de Página Institucional y Créditos de Licenciamiento Obligatorios -->
+    <footer class="dino-footer border-top mt-auto" id="acerca-fuentes">
+        <div class="container-xxl py-5">
+            <div class="row g-4 justify-content-between">
+                <div class="col-12 col-md-5">
+                    <div class="dino-footer-brand mb-2">
+                        <span class="dino-brand-title">Dinosaurios del Mesozoico</span>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        Catálogo taxonómico, cronológico y morfológico estructurado para la divulgación paleobiológica.
+                        Los registros fósiles están ordenados según la Escala Cronoestratigráfica Internacional (ICS),
+                        desde las capas más jóvenes del Cretácico terminal (66 Ma) hasta el Triásico inferior (251,9 Ma).
+                    </p>
+                    <p class="text-muted small mb-0">
+                        ASP.NET Core (.NET 8) · Dapper · SQLite · Interfaz tipográfica de museo.
+                    </p>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-5">
+                    <h2 class="h6 text-uppercase tracking-wider fw-bold text-dark mb-3">Fuentes de Datos &amp; Licenciamiento</h2>
+                    <ul class="list-unstyled small text-muted mb-0 d-flex flex-column gap-2">
+                        <li class="d-flex align-items-start gap-2">
+                            <span class="dino-bullet text-amber" aria-hidden="true">&bull;</span>
+                            <div>
+                                <strong class="text-dark">Paleobiology Database (PBDB):</strong>
+                                Datos taxonómicos, estratos geológicos y estimaciones cronológicas provistos bajo licencia
+                                <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener noreferrer" class="dino-link">Creative Commons Attribution 4.0 (CC BY 4.0)</a>.
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <span class="dino-bullet text-amber" aria-hidden="true">&bull;</span>
+                            <div>
+                                <strong class="text-dark">Wikipedia en español:</strong>
+                                Sinopsis introductorias y descripciones bajo licencia
+                                <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer" class="dino-link">Creative Commons Atribución-CompartirIgual 4.0 (CC BY-SA 4.0)</a>.
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <span class="dino-bullet text-amber" aria-hidden="true">&bull;</span>
+                            <div>
+                                <strong class="text-dark">Wikimedia Commons:</strong>
+                                Fotografías y paleoarte de especies semilla bajo sus respectivas licencias libres especificadas en cada ficha.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dino-footer-bottom border-top pt-3 mt-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 small text-muted">
+                <div>
+                    &copy; @DateTime.UtcNow.Year Dinosaurios del Mesozoico. Consulta científica abierta.
+                </div>
+                <div>
+                    Estratigrafía ICS v2024/05
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

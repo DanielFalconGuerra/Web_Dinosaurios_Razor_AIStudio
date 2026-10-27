@@ -1,0 +1,563 @@
+@*
+    =============================================================================
+    Web_Dinosaurios — Views/Dinosaurios/Index.cshtml
+    Catálogo Estratigráfico y Taxonómico de Dinosaurios del Mesozoico
+    Modelo: IReadOnlyList<Web_Dinosaurios.Models.Dinosaurio>
+    =============================================================================
+*@
+@model IReadOnlyList<Web_Dinosaurios.Models.Dinosaurio>
+@{
+    ViewData["Title"] = "Catálogo Estratigráfico";
+
+    var nombreActual = ViewData["NombreActual"] as string ?? string.Empty;
+    var periodoActual = ViewData["PeriodoActual"] as string ?? string.Empty;
+    var periodosValidos = ViewData["PeriodosValidos"] as string[] ?? Array.Empty<string>();
+    var dietaActual = ViewData["DietaActual"] as string ?? string.Empty;
+    var dietasValidas = ViewData["DietasValidas"] as string[] ?? Array.Empty<string>();
+    var conImagenActual = ViewData["ConImagenActual"] as bool? ?? false;
+
+    var pagina = ViewData["Pagina"] as int? ?? 1;
+    var totalPaginas = ViewData["TotalPaginas"] as int? ?? 1;
+    var total = ViewData["Total"] as int? ?? 0;
+    var tamanoPagina = ViewData["TamanoPagina"] as int? ?? 24;
+
+    var hayFiltros = !string.IsNullOrWhiteSpace(nombreActual)
+                  || !string.IsNullOrWhiteSpace(periodoActual)
+                  || !string.IsNullOrWhiteSpace(dietaActual)
+                  || conImagenActual;
+
+    var desde = total == 0 ? 0 : ((pagina - 1) * tamanoPagina) + 1;
+    var hasta = Math.Min(pagina * tamanoPagina, total);
+
+    // Agrupación estratigráfica por Época/Período conservando el orden SQL (más reciente a más antiguo)
+    var estratos = Model.GroupBy(d => d.Periodo).ToList();
+}
+
+<div class="container-xxl py-4 py-lg-5">
+
+    <!-- Encabezado de la Colección y Presentación de la Escala -->
+    <section class="dino-hero mb-4 pb-3 border-bottom">
+        <div class="row align-items-end g-3">
+            <div class="col-12 col-lg-8">
+                <span class="dino-kicker text-uppercase tracking-widest text-muted small fw-semibold">
+                    Registro Fósil Global · 251,9 a 66 Ma
+                </span>
+                <h1 class="dino-title display-5 fw-bold text-dark mt-1 mb-2">
+                    Fauna Dinosauriana del Mesozoico
+                </h1>
+                <p class="dino-lede text-muted mb-0">
+                    Explora 1.617 taxones ordenados cronoestratigráficamente desde las capas terminales del Cretácico
+                    hasta los albores del Triásico. Filtra por época geológica, régimen trófico o presencia de fotografía histórica.
+                </p>
+            </div>
+            <div class="col-12 col-lg-4 text-lg-end">
+                <div class="dino-counter-plate d-inline-block text-start text-lg-end">
+                    <span class="d-block small text-muted text-uppercase tracking-wider">Muestra en catálogo</span>
+                    <span class="dino-counter-num dino-mono-num fw-bold">@total.ToString("N0")</span>
+                    <span class="d-block small text-muted">especies clasificadas</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Escala Estratigráfica Interactiva (Selector Visual Rápido) -->
+    <section class="dino-scale-section mb-4" id="escala-mesozoica" aria-label="Selector de Período Geológico">
+        <div class="dino-scale-bar p-2 rounded-3 border">
+            <div class="row g-2 align-items-center">
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Dinosaurios"
+                       asp-action="Index"
+                       asp-route-nombre="@nombreActual"
+                       asp-route-periodo=""
+                       asp-route-dieta="@dietaActual"
+                       asp-route-conImagen="@(conImagenActual ? "true" : null)"
+                       class="dino-scale-btn w-100 text-decoration-none @(string.IsNullOrEmpty(periodoActual) ? "dino-scale-active" : "")">
+                        <span class="dino-scale-tag">Era Completa</span>
+                        <span class="dino-scale-name">Mesozoico</span>
+                        <span class="dino-scale-ma dino-mono-num">251,9–66 Ma</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Dinosaurios"
+                       asp-action="Index"
+                       asp-route-nombre="@nombreActual"
+                       asp-route-periodo="Cretácico"
+                       asp-route-dieta="@dietaActual"
+                       asp-route-conImagen="@(conImagenActual ? "true" : null)"
+                       class="dino-scale-btn dino-scale-cretacico w-100 text-decoration-none @(periodoActual == "Cretácico" ? "dino-scale-active" : "")">
+                        <span class="dino-scale-tag">Último período</span>
+                        <span class="dino-scale-name">Cretácico</span>
+                        <span class="dino-scale-ma dino-mono-num">145–66 Ma</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Dinosaurios"
+                       asp-action="Index"
+                       asp-route-nombre="@nombreActual"
+                       asp-route-periodo="Jurásico"
+                       asp-route-dieta="@dietaActual"
+                       asp-route-conImagen="@(conImagenActual ? "true" : null)"
+                       class="dino-scale-btn dino-scale-jurasico w-100 text-decoration-none @(periodoActual == "Jurásico" ? "dino-scale-active" : "")">
+                        <span class="dino-scale-tag">Apogeo de gigantes</span>
+                        <span class="dino-scale-name">Jurásico</span>
+                        <span class="dino-scale-ma dino-mono-num">201,4–145 Ma</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Dinosaurios"
+                       asp-action="Index"
+                       asp-route-nombre="@nombreActual"
+                       asp-route-periodo="Triásico"
+                       asp-route-dieta="@dietaActual"
+                       asp-route-conImagen="@(conImagenActual ? "true" : null)"
+                       class="dino-scale-btn dino-scale-triasico w-100 text-decoration-none @(periodoActual == "Triásico" ? "dino-scale-active" : "")">
+                        <span class="dino-scale-tag">Radiación basal</span>
+                        <span class="dino-scale-name">Triásico</span>
+                        <span class="dino-scale-ma dino-mono-num">251,9–201,4 Ma</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Barra de Filtros y Búsqueda GET -->
+    <section class="dino-filters-panel p-3 p-md-4 rounded-3 border mb-4" aria-label="Herramientas de filtrado">
+        <form method="get" asp-controller="Dinosaurios" asp-action="Index" class="row g-3 align-items-end">
+            <!-- Búsqueda por Nombre / Taxón -->
+            <div class="col-12 col-md-4 col-lg-3">
+                <label for="filtro-nombre" class="form-label dino-label">Nombre científico o género</label>
+                <div class="input-group">
+                    <input type="text"
+                           id="filtro-nombre"
+                           name="nombre"
+                           value="@nombreActual"
+                           class="form-control dino-input"
+                           placeholder="p. ej. Tyrannosaurus, Coelophysis..."
+                           autocomplete="off" />
+                </div>
+            </div>
+
+            <!-- Período Geológico -->
+            <div class="col-6 col-md-3 col-lg-2">
+                <label for="filtro-periodo" class="form-label dino-label">Período</label>
+                <select id="filtro-periodo" name="periodo" class="form-select dino-select">
+                    <option value="">Todos los períodos</option>
+                    @foreach (var p in periodosValidos)
+                    {
+                        if (string.Equals(p, periodoActual, StringComparison.OrdinalIgnoreCase))
+                        {
+                            <option value="@p" selected="selected">@p</option>
+                        }
+                        else
+                        {
+                            <option value="@p">@p</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <!-- Dieta / Régimen Trófico -->
+            <div class="col-6 col-md-3 col-lg-2">
+                <label for="filtro-dieta" class="form-label dino-label">Dieta</label>
+                <select id="filtro-dieta" name="dieta" class="form-select dino-select">
+                    <option value="">Todas las dietas</option>
+                    @foreach (var d in dietasValidas)
+                    {
+                        if (string.Equals(d, dietaActual, StringComparison.OrdinalIgnoreCase))
+                        {
+                            <option value="@d" selected="selected">@d</option>
+                        }
+                        else
+                        {
+                            <option value="@d">@d</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <!-- Checkbox Solo con Fotografía Histórica -->
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="form-check dino-check-box py-2">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="filtro-con-imagen"
+                           name="conImagen"
+                           value="true"
+                           @(conImagenActual ? "checked=\"checked\"" : "") />
+                    <label class="form-check-label dino-label-check" for="filtro-con-imagen">
+                        Solo con fotografía (especies ilustradas)
+                    </label>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="col-12 col-md-8 col-lg-2 d-flex gap-2">
+                <button type="submit" class="btn dino-btn-primary flex-grow-1">
+                    Filtrar
+                </button>
+                @if (hayFiltros)
+                {
+                    <a asp-controller="Dinosaurios"
+                       asp-action="Index"
+                       class="btn dino-btn-ghost"
+                       title="Restablecer todos los filtros"
+                       aria-label="Restablecer filtros">
+                        Limpiar
+                    </a>
+                }
+            </div>
+        </form>
+
+        <!-- Indicador de filtros activos -->
+        @if (hayFiltros)
+        {
+            <div class="dino-active-filters mt-3 pt-2 border-top d-flex flex-wrap align-items-center gap-2 small text-muted">
+                <span class="fw-semibold text-dark">Filtros aplicados:</span>
+                @if (!string.IsNullOrWhiteSpace(nombreActual))
+                {
+                    <span class="dino-filter-crumb">Texto: <em>@nombreActual</em></span>
+                }
+                @if (!string.IsNullOrWhiteSpace(periodoActual))
+                {
+                    <span class="dino-filter-crumb">Período: @periodoActual</span>
+                }
+                @if (!string.IsNullOrWhiteSpace(dietaActual))
+                {
+                    <span class="dino-filter-crumb">Dieta: @dietaActual</span>
+                }
+                @if (conImagenActual)
+                {
+                    <span class="dino-filter-crumb">Solo ilustrados</span>
+                }
+                <a asp-controller="Dinosaurios" asp-action="Index" class="dino-link ms-auto">Quitar todos los filtros</a>
+            </div>
+        }
+    </section>
+
+    <!-- Resumen de Resultados y Paginación Superior -->
+    @if (total > 0 && Model.Count > 0)
+    {
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center pb-3 mb-4 border-bottom text-muted small">
+            <div>
+                Mostrando <strong class="text-dark dino-mono-num">@desde–@hasta</strong> de <strong class="text-dark dino-mono-num">@total.ToString("N0")</strong> dinosaurios registrados
+            </div>
+            <div class="dino-mono-num">
+                Página @pagina de @totalPaginas
+            </div>
+        </div>
+    }
+
+    <!-- ========================================================================= -->
+    <!-- ESTADOS VACÍOS                                                           -->
+    <!-- ========================================================================= -->
+    @if (total > 0 && Model.Count == 0)
+    {
+        <!-- Caso 1: Página fuera de rango -->
+        <div class="dino-empty-card p-5 text-center my-5 rounded-3 border">
+            <div class="dino-empty-footprint mb-3" aria-hidden="true">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+            </div>
+            <h2 class="h4 fw-bold text-dark mb-2">Página fuera de estrato</h2>
+            <p class="text-muted mb-4 max-w-prose mx-auto">
+                La página solicitada (<span class="dino-mono-num">@pagina</span>) excede los registros disponibles para los filtros actuales.
+            </p>
+            <a asp-controller="Dinosaurios"
+               asp-action="Index"
+               asp-route-nombre="@nombreActual"
+               asp-route-periodo="@periodoActual"
+               asp-route-dieta="@dietaActual"
+               asp-route-conImagen="@(conImagenActual ? "true" : null)"
+               class="btn dino-btn-primary">
+                Regresar a la página 1
+            </a>
+        </div>
+    }
+    else if (hayFiltros && total == 0)
+    {
+        <!-- Caso 2: Búsqueda sin coincidencias -->
+        <div class="dino-empty-card p-5 text-center my-5 rounded-3 border">
+            <div class="dino-empty-footprint mb-3" aria-hidden="true">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    <line x1="8" y1="11" x2="14" y2="11"/>
+                </svg>
+            </div>
+            <h2 class="h4 fw-bold text-dark mb-2">Sin hallazgos fósiles</h2>
+            <p class="text-muted mb-4 max-w-prose mx-auto">
+                No existen registros que coincidan con los criterios de búsqueda seleccionados. Modifica el término o restablece los filtros estratigráficos.
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a asp-controller="Dinosaurios" asp-action="Index" class="btn dino-btn-primary">
+                    Ver todos los 1.617 dinosaurios
+                </a>
+            </div>
+        </div>
+    }
+    else if (Model.Count == 0)
+    {
+        <!-- Caso 3: Catálogo vacío -->
+        <div class="dino-empty-card p-5 text-center my-5 rounded-3 border">
+            <h2 class="h4 fw-bold text-dark mb-2">Catálogo en catalogación</h2>
+            <p class="text-muted mb-0">No hay registros paleobiológicos cargados en la base de datos.</p>
+        </div>
+    }
+    else
+    {
+        <!-- ========================================================================= -->
+        <!-- LISTADO AGRUPADO POR ESTRATO GEOLÓGICO                                    -->
+        <!-- ========================================================================= -->
+        @foreach (var estrato in estratos)
+        {
+            var epocaClase = Presentacion.ClasesPeriodo(estrato.Key);
+            var limitesMa = Presentacion.LimitesEpoca(estrato.Key);
+
+            <section class="dino-stratum-group mb-5" aria-labelledby="stratum-@estrato.Key.Replace(" ", "-").ToLowerInvariant()">
+                <!-- Cabecera de Estrato / Época -->
+                <header class="dino-stratum-header d-flex flex-wrap align-items-baseline justify-content-between gap-2 pb-2 mb-3 border-bottom @epocaClase">
+                    <div class="d-flex align-items-baseline gap-3">
+                        <h2 id="stratum-@estrato.Key.Replace(" ", "-").ToLowerInvariant()" class="dino-stratum-title h4 fw-bold text-dark mb-0">
+                            @estrato.Key
+                        </h2>
+                        @if (!string.IsNullOrWhiteSpace(limitesMa))
+                        {
+                            <span class="dino-stratum-badge dino-mono-num">
+                                @limitesMa
+                            </span>
+                        }
+                    </div>
+                    <span class="text-muted small">
+                        @estrato.Count() @(estrato.Count() == 1 ? "género en este bloque" : "géneros en este bloque")
+                    </span>
+                </header>
+
+                <!-- Cuadrícula de Dinosaurios de este Estrato -->
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+                    @foreach (var dino in estrato)
+                    {
+                        var esIcono = Presentacion.EsIcono(dino.ImagenUrl);
+                        var datosBreves = Presentacion.DatosBreves(dino.Dieta, dino.Region);
+                        var cardPeriodoClases = Presentacion.ClasesPeriodo(dino.Periodo);
+
+                        <div class="col">
+                            <article class="card dino-card h-100 border rounded-3 @(esIcono ? "dino-card-plate" : "dino-card-illustrated") @cardPeriodoClases">
+                                
+                                <!-- Zona Visual: Fotografía de alta resolución o Ficha de Campo con Huella -->
+                                @if (!esIcono)
+                                {
+                                    <!-- Especie con Foto (Wikimedia Commons) -->
+                                    <div class="dino-card-media-wrapper position-relative overflow-hidden">
+                                        <img src="@dino.ImagenUrl"
+                                             alt="Reconstrucción fósil de @dino.Nombre"
+                                             class="dino-card-img w-100 object-fit-cover"
+                                             loading="lazy"
+                                             referrerpolicy="no-referrer" />
+                                        <span class="dino-card-photo-tag position-absolute top-0 end-0 m-2 badge">
+                                            Foto Archivo
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <!-- Especie Fósil Documentada (PBDB / Wikipedia sin foto) -->
+                                    <div class="dino-card-plate-seal d-flex align-items-center justify-content-between p-3 border-bottom">
+                                        <div class="dino-plate-footprint" aria-hidden="true">
+                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 2C10.5 4 8.5 7.5 7 10c-1 1.6-1.5 3-1.5 4.5 0 3.6 2.9 6.5 6.5 6.5s6.5-2.9 6.5-6.5c0-1.5-.5-2.9-1.5-4.5-1.5-2.5-3.5-6-5-8zm-5 7c-.6 0-1.1-.4-1.3-.9L5 6.5C4.7 5.7 5.2 4.9 6 4.6c.8-.3 1.7.2 2 1l.7 1.6c.3.8-.1 1.8-.7 1.8zm10 0c-.6 0-1-.8-.7-1.8l.7-1.6c.3-.8 1.2-1.3 2-1 .8.3 1.3 1.1 1 1.9l-.7 1.6c-.2.5-.7.9-1.3.9z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="dino-plate-code dino-mono-num text-muted small">
+                                            PBDB @(dino.PbdbId?.ToString() ?? $"#{dino.Id:D4}")
+                                        </span>
+                                    </div>
+                                }
+
+                                <div class="card-body d-flex flex-column p-3">
+                                    <!-- Cronología y Época -->
+                                    <div class="d-flex align-items-center justify-content-between gap-1 mb-1 small text-muted">
+                                        <span class="dino-card-period text-truncate fw-semibold">
+                                            @dino.Periodo
+                                        </span>
+                                        <span class="dino-mono-num dino-card-age text-nowrap">
+                                            @dino.Antiguedad
+                                        </span>
+                                    </div>
+
+                                    <!-- Nombre Científico (SIEMPRE EN CURSIVA) -->
+                                    <h3 class="card-title h5 mb-2">
+                                        <a asp-controller="Dinosaurios"
+                                           asp-action="Detalle"
+                                           asp-route-id="@dino.Id"
+                                           class="dino-taxon-link text-decoration-none">
+                                            <em>@dino.Nombre</em>
+                                        </a>
+                                    </h3>
+
+                                    <!-- Datos Breves (Dieta, Región omitiendo Sin datos) -->
+                                    <div class="dino-brief-meta text-muted small mb-2">
+                                        @datosBreves
+                                    </div>
+
+                                    <!-- Sinopsis Introductoria -->
+                                    <p class="card-text dino-card-desc text-muted small flex-grow-1 mb-3">
+                                        @dino.Descripcion
+                                    </p>
+
+                                    <!-- Pie de Tarjeta con Enlace de Detalle -->
+                                    <div class="mt-auto pt-2 border-top d-flex align-items-center justify-content-between">
+                                        <a asp-controller="Dinosaurios"
+                                           asp-action="Detalle"
+                                           asp-route-id="@dino.Id"
+                                           class="dino-action-link text-decoration-none small fw-semibold">
+                                            Ver ficha estratigráfica &rarr;
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+
+        <!-- ========================================================================= -->
+        <!-- PAGINACIÓN PRESERVANDO PARÁMETROS DE BÚSQUEDA                             -->
+        <!-- ========================================================================= -->
+        @if (totalPaginas > 1)
+        {
+            <nav class="dino-pagination-nav mt-5 pt-4 border-top" aria-label="Navegación de páginas del catálogo">
+                <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                    <!-- Resumen de Rango Inferior -->
+                    <div class="dino-pagination-info small text-muted">
+                        Del <strong class="text-dark dino-mono-num">@desde</strong> al <strong class="text-dark dino-mono-num">@hasta</strong> de <strong class="text-dark dino-mono-num">@total.ToString("N0")</strong> dinosaurios
+                    </div>
+
+                    <!-- Controles de Páginas -->
+                    <ul class="pagination dino-pagination mb-0 flex-wrap justify-content-center">
+                        <!-- Botón Anterior -->
+                        @if (pagina > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link"
+                                   asp-controller="Dinosaurios"
+                                   asp-action="Index"
+                                   asp-route-nombre="@nombreActual"
+                                   asp-route-periodo="@periodoActual"
+                                   asp-route-dieta="@dietaActual"
+                                   asp-route-conImagen="@(conImagenActual ? "true" : null)"
+                                   asp-route-pagina="@(pagina == 2 ? null : (pagina - 1))"
+                                   aria-label="Página anterior">
+                                    &larr; Anterior
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled" aria-disabled="true">
+                                <span class="page-link">&larr; Anterior</span>
+                            </li>
+                        }
+
+                        <!-- Primera Página -->
+                        <li class="page-item @(pagina == 1 ? "active" : "")">
+                            <a class="page-link dino-mono-num"
+                               asp-controller="Dinosaurios"
+                               asp-action="Index"
+                               asp-route-nombre="@nombreActual"
+                               asp-route-periodo="@periodoActual"
+                               asp-route-dieta="@dietaActual"
+                               asp-route-conImagen="@(conImagenActual ? "true" : null)"
+                               aria-label="Página 1">
+                                1
+                            </a>
+                        </li>
+
+                        <!-- Elipsis si hay salto antes de la ventana central -->
+                        @if (pagina > 4)
+                        {
+                            <li class="page-item disabled" aria-disabled="true">
+                                <span class="page-link">&hellip;</span>
+                            </li>
+                        }
+
+                        <!-- Ventana Central de Páginas (±2) -->
+                        @{
+                            var inicioVentana = Math.Max(2, pagina - 2);
+                            var finVentana = Math.Min(totalPaginas - 1, pagina + 2);
+                        }
+                        @for (int p = inicioVentana; p <= finVentana; p++)
+                        {
+                            <li class="page-item @(p == pagina ? "active" : "")">
+                                <a class="page-link dino-mono-num"
+                                   asp-controller="Dinosaurios"
+                                   asp-action="Index"
+                                   asp-route-nombre="@nombreActual"
+                                   asp-route-periodo="@periodoActual"
+                                   asp-route-dieta="@dietaActual"
+                                   asp-route-conImagen="@(conImagenActual ? "true" : null)"
+                                   asp-route-pagina="@p"
+                                   aria-label="Página @p"
+                                   aria-current="@(p == pagina ? "page" : null)">
+                                    @p
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Elipsis si hay salto tras la ventana central -->
+                        @if (pagina < totalPaginas - 3)
+                        {
+                            <li class="page-item disabled" aria-disabled="true">
+                                <span class="page-link">&hellip;</span>
+                            </li>
+                        }
+
+                        <!-- Última Página -->
+                        @if (totalPaginas > 1)
+                        {
+                            <li class="page-item @(pagina == totalPaginas ? "active" : "")">
+                                <a class="page-link dino-mono-num"
+                                   asp-controller="Dinosaurios"
+                                   asp-action="Index"
+                                   asp-route-nombre="@nombreActual"
+                                   asp-route-periodo="@periodoActual"
+                                   asp-route-dieta="@dietaActual"
+                                   asp-route-conImagen="@(conImagenActual ? "true" : null)"
+                                   asp-route-pagina="@totalPaginas"
+                                   aria-label="Página @totalPaginas">
+                                    @totalPaginas
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Botón Siguiente -->
+                        @if (pagina < totalPaginas)
+                        {
+                            <li class="page-item">
+                                <a class="page-link"
+                                   asp-controller="Dinosaurios"
+                                   asp-action="Index"
+                                   asp-route-nombre="@nombreActual"
+                                   asp-route-periodo="@periodoActual"
+                                   asp-route-dieta="@dietaActual"
+                                   asp-route-conImagen="@(conImagenActual ? "true" : null)"
+                                   asp-route-pagina="@(pagina + 1)"
+                                   aria-label="Página siguiente">
+                                    Siguiente &rarr;
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled" aria-disabled="true">
+                                <span class="page-link">Siguiente &rarr;</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </nav>
+        }
+    }
+
+</div>
