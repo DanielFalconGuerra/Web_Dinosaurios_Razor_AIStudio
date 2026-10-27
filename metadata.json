@@ -1,6 +1,0 @@
-{
-  "name": "Web_Dinosaurios — Dinosaurios del Mesozoico",
-  "description": "Catálogo estratigráfico y taxonómico de 1.617 dinosaurios del Mesozoico con vistas Razor (.NET 8) y diseño editorial de museo paleobiológico.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
